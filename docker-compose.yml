@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: unity-postgres
+    environment:
+      POSTGRES_DB: IntoTheNight
+      POSTGRES_USER: petrov
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - unity-network
+
+  unity-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: unity-app
+    ports:
+      - "2706:2706"
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=IntoTheNight
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - unity-network
+
+networks:
+  unity-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
