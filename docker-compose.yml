@@ -5,8 +5,8 @@ services:
     image: postgres:15
     container_name: unity-postgres
     environment:
-      POSTGRES_DB: IntoTheNight
-      POSTGRES_USER: petrov
+      POSTGRES_DB: unity_db
+      POSTGRES_USER: unity_user
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
@@ -17,7 +17,7 @@ services:
 
   unity-app:
     build: 
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     container_name: unity-app
     ports:
@@ -27,9 +27,22 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=IntoTheNight
-      - DB_USER=${DB_USER}
+      - DB_NAME=unity_db
+      - DB_USER=unity_user
       - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - unity-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: unity-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@unity.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
     networks:
       - unity-network
 
